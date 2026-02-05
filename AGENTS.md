@@ -92,6 +92,8 @@ If something fails or a first attempt is wrong, append a new row immediately and
 | Date (YYYY-MM-DD) | Context | What failed | Root cause | Fix applied | Prevention rule added |
 |---|---|---|---|---|---|
 | 2026-02-05 | Project bootstrap (`npm install`) | Dependency installation failed (`ENOTFOUND`) | DNS/network access to `registry.npmjs.org` unavailable in current environment | Completed local scaffold files first; deferred dependency install until network is available | Before running `npm install`, verify npm registry reachability in the environment (`npm ping` or DNS check) |
+| 2026-02-05 | Core game implementation (`npm run build`) | TypeScript build failed on first integration pass | Strict nullability and `noUnusedLocals` issues were missed while composing multiple systems in parallel | Added explicit null-guard for `createCanvas` and cleaned HUD unused/implicit-any issues | Run `npm run build` after each subsystem merge (assets, UI, systems) before wiring scene integration |
+| 2026-02-05 | Runtime validation (`npm run dev`, `npm run preview`) | Local servers could not start (`listen EPERM`) | Current sandbox environment blocks binding to localhost ports | Completed build-level validation and documented runtime verification as environment-dependent | Before runtime checks, confirm the environment allows opening local listening sockets |
 
 ### Logging Rules
 - Never rewrite old rows; only append.

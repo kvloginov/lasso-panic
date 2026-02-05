@@ -1,34 +1,25 @@
 import Phaser from 'phaser';
 
-class MainScene extends Phaser.Scene {
-  constructor() {
-    super('MainScene');
-  }
+import { CONFIG } from './config';
+import { BootScene } from './game/scenes/BootScene';
+import { GameScene } from './game/scenes/GameScene';
 
-  create(): void {
-    const { width, height } = this.scale;
-    this.add
-      .text(width / 2, height / 2, 'Lasso Panic\nVite + TypeScript + Phaser 3', {
-        color: '#f4f4f4',
-        fontSize: '24px',
-        align: 'center'
-      })
-      .setOrigin(0.5);
-  }
-}
-
-const config: Phaser.Types.Core.GameConfig = {
+const gameConfig: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   parent: 'app',
-  width: 960,
-  height: 540,
-  backgroundColor: '#1d2430',
+  backgroundColor: '#101923',
   render: {
     pixelArt: true,
     antialias: false,
     roundPixels: true
   },
-  scene: [MainScene]
+  scale: {
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+    width: CONFIG.gameWidth,
+    height: CONFIG.gameHeight
+  },
+  scene: [BootScene, GameScene]
 };
 
-new Phaser.Game(config);
+new Phaser.Game(gameConfig);
