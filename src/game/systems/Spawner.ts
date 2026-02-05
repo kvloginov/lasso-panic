@@ -2,7 +2,7 @@ import type Phaser from 'phaser';
 
 import { SfxEngine } from '../../audio/sfx';
 import { CONFIG } from '../../config';
-import { Item } from '../entities/Item';
+import { Item, ItemState } from '../entities/Item';
 import type { TextureCatalog } from '../../assets/generateTextures';
 import { distance } from '../../utils/geometry';
 import { clamp } from '../../utils/clamp';
@@ -57,6 +57,10 @@ export class Spawner {
 
   public getItems(): readonly Item[] {
     return this.items;
+  }
+
+  public getActiveItems(): readonly Item[] {
+    return this.items.filter((item) => item.state === ItemState.Active);
   }
 
   public removeItems(itemsToRemove: readonly Item[]): void {

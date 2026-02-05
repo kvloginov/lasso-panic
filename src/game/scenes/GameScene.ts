@@ -3,7 +3,7 @@ import Phaser from 'phaser';
 import type { TextureCatalog } from '../../assets/generateTextures';
 import { SfxEngine } from '../../audio/sfx';
 import { CONFIG } from '../../config';
-import { Item, ItemState } from '../entities/Item';
+import { Item } from '../entities/Item';
 import { LassoSelection } from '../systems/LassoSelection';
 import { Spawner } from '../systems/Spawner';
 import { Hud } from '../../ui/Hud';
@@ -63,6 +63,7 @@ export class GameScene extends Phaser.Scene {
 
     this.texturesCatalog = texturesCatalog;
     this.sfx = sfx;
+    this.state = SessionState.StartOverlay;
 
     this.health = CONFIG.healthStart;
     this.score = 0;
@@ -73,7 +74,7 @@ export class GameScene extends Phaser.Scene {
     this.bestScore = getStoredNumber(CONFIG.storageBestScoreKey, 0);
     this.bestTimeSec = getStoredNumber(CONFIG.storageBestTimeKey, 0);
 
-    this.add.rectangle(CONFIG.gameWidth / 2, CONFIG.gameHeight / 2, CONFIG.gameWidth, CONFIG.gameHeight, 0x19222f, 1);
+    this.createBackdrop();
 
     this.spawner = new Spawner({
       scene: this,
@@ -170,17 +171,20 @@ export class GameScene extends Phaser.Scene {
         return;
       }
 
-      const activeItems = this.spawner.getItems().filter((item) => item.state === ItemState.Active);
-      const result = this.lasso.endAndEvaluate(activeItems);
+      if (!this.lasso.isDrawing()) {
+        return;
+      }
+
+      const result = this.lasso.endAndEvaluate(this.spawner.getActiveItems());
 
       if (!result.isValid || result.reason === 'invalid') {
-        this.combo = 0;
+        this.showFeedback('Too short', CONFIG.gameWidth / 2, CONFIG.gameHeight * 0.26, '#f4e8af');
         this.refreshHud();
         return;
       }
 
       if (result.reason === 'empty' || result.selected.length === 0) {
-        this.combo = 0;
+        this.showFeedback('No active items', CONFIG.gameWidth / 2, CONFIG.gameHeight * 0.26, '#d1dcff');
         this.refreshHud();
         return;
       }
@@ -271,6 +275,7 @@ export class GameScene extends Phaser.Scene {
 
     this.sfx.success(count, this.combo);
     this.flash(CONFIG.successFlashColor);
+    this.emitSuccessSparkles(x, y);
     this.showFeedback(`+${count}`, x, y, '#c5ffbd');
   }
 
@@ -314,6 +319,26 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
+  private emitSuccessSparkles(x: number, y: number): void {
+    for (let i = 0; i < 8; i += 1) {
+      const sparkle = this.add.circle(x, y, 2, 0xfff1c1, 0.95).setDepth(135);
+      const angle = (Math.PI * 2 * i) / 8 + Phaser.Math.FloatBetween(-0.2, 0.2);
+      const distance = Phaser.Math.FloatBetween(18, 42);
+      const targetX = x + Math.cos(angle) * distance;
+      const targetY = y + Math.sin(angle) * distance;
+
+      this.tweens.add({
+        targets: sparkle,
+        x: targetX,
+        y: targetY,
+        alpha: 0,
+        duration: 260,
+        ease: 'Sine.Out',
+        onComplete: () => sparkle.destroy()
+      });
+    }
+  }
+
   private refreshHud(forceMuted?: boolean): void {
     this.hud.update({
       health: this.health,
@@ -324,5 +349,25 @@ export class GameScene extends Phaser.Scene {
       muted: forceMuted ?? this.sfx.isMuted(),
       paused: this.state === SessionState.Paused
     });
+  }
+
+  private createBackdrop(): void {
+    this.add.rectangle(CONFIG.gameWidth / 2, CONFIG.gameHeight / 2, CONFIG.gameWidth, CONFIG.gameHeight, 0x18212d, 1);
+    this.add.rectangle(CONFIG.gameWidth / 2, CONFIG.gameHeight * 0.2, CONFIG.gameWidth, 130, 0x24344a, 0.35);
+    this.add.rectangle(CONFIG.gameWidth / 2, CONFIG.gameHeight * 0.84, CONFIG.gameWidth, 160, 0x111826, 0.5);
+
+    for (let i = 0; i < 10; i += 1) {
+      const x = Phaser.Math.Between(30, CONFIG.gameWidth - 30);
+      const y = Phaser.Math.Between(24, CONFIG.gameHeight - 24);
+      const twinkle = this.add.circle(x, y, Phaser.Math.Between(1, 2), 0xf6f2e8, 0.35).setDepth(5);
+      this.tweens.add({
+        targets: twinkle,
+        alpha: Phaser.Math.FloatBetween(0.08, 0.4),
+        duration: Phaser.Math.Between(900, 1900),
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.InOut'
+      });
+    }
   }
 }

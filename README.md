@@ -36,6 +36,7 @@ npm run preview
   - items are kept
   - damage is applied
   - camera shake + error flash/SFX are triggered
+- Empty or too-short lasso: no score/health change (feedback only).
 - Game ends when health reaches `0`.
 - Best score and best survival time are saved in `localStorage`.
 

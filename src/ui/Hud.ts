@@ -48,9 +48,12 @@ export class Hud {
 
   private readonly gameOverText: Phaser.GameObjects.Text;
 
+  private readonly pauseContainer: Phaser.GameObjects.Container;
+
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
 
+    scene.add.rectangle(10, 10, 274, 128, 0x111925, 0.56).setOrigin(0, 0).setDepth(98);
     scene.add.rectangle(LEFT_MARGIN, TOP_MARGIN, 220, 14, 0x22303d, 0.9).setOrigin(0, 0).setDepth(100);
     this.healthFill = scene.add.rectangle(LEFT_MARGIN + 2, TOP_MARGIN + 2, 216, 10, 0x95d67f, 1).setOrigin(0, 0).setDepth(101);
     this.healthText = this.makeText(LEFT_MARGIN, TOP_MARGIN + 18, 'HP 100');
@@ -103,6 +106,22 @@ export class Hud {
       .add.container(0, 0, [gameOverBackground, gameOverTitle, this.gameOverText, gameOverHint])
       .setDepth(220)
       .setVisible(false);
+
+    const pauseBackground = scene.add
+      .rectangle(CONFIG.gameWidth / 2, CONFIG.gameHeight / 2, CONFIG.gameWidth, CONFIG.gameHeight, 0x121820, 0.52)
+      .setDepth(210);
+
+    const pauseTitle = scene.add
+      .text(CONFIG.gameWidth / 2, CONFIG.gameHeight / 2 - 10, 'PAUSED', this.bigTextStyle())
+      .setOrigin(0.5)
+      .setDepth(211);
+
+    const pauseHint = scene.add
+      .text(CONFIG.gameWidth / 2, CONFIG.gameHeight / 2 + 34, 'Press P to continue', this.smallTextStyle())
+      .setOrigin(0.5)
+      .setDepth(211);
+
+    this.pauseContainer = scene.add.container(0, 0, [pauseBackground, pauseTitle, pauseHint]).setDepth(210).setVisible(false);
   }
 
   public update(snapshot: HudSnapshot): void {
@@ -112,13 +131,14 @@ export class Hud {
     this.healthFill.width = 216 * ratio;
     this.healthFill.fillColor = health > 50 ? 0x95d67f : health > 25 ? 0xffc95f : 0xff6f6f;
 
-    this.healthText.setText(`HP ${health.toFixed(1)}`);
+    this.healthText.setText(`HP ${Math.round(health)}`);
     this.scoreText.setText(`Score ${snapshot.score}`);
     this.timeText.setText(`Time ${snapshot.timeSec.toFixed(1)}s`);
     this.levelText.setText(`Level ${snapshot.level}`);
     this.comboText.setText(`Combo x${snapshot.combo}`);
     this.muteText.setText(snapshot.muted ? 'M: sound off' : 'M: sound on');
     this.pauseText.setText(snapshot.paused ? 'P: paused' : 'P: running');
+    this.pauseContainer.setVisible(snapshot.paused);
   }
 
   public showStart(): void {

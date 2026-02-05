@@ -40,6 +40,10 @@ export class LassoSelection {
     }
   }
 
+  public isDrawing(): boolean {
+    return this.drawing;
+  }
+
   public begin(x: number, y: number): void {
     if (!this.enabled) {
       return;
@@ -152,12 +156,17 @@ export class LassoSelection {
     }
 
     this.graphics.lineStyle(2, 0xfff1c1, 0.95);
-    this.graphics.fillStyle(0xfff1c1, 0.08);
+    this.graphics.fillStyle(0xfff1c1, this.points.length >= 3 ? 0.12 : 0.04);
     this.graphics.beginPath();
     this.graphics.moveTo(this.points[0].x, this.points[0].y);
 
     for (let i = 1; i < this.points.length; i += 1) {
       this.graphics.lineTo(this.points[i].x, this.points[i].y);
+    }
+
+    if (this.points.length >= 3) {
+      this.graphics.closePath();
+      this.graphics.fillPath();
     }
 
     this.graphics.strokePath();
