@@ -59,6 +59,7 @@ Build a fully playable single-screen game, **Lasso Panic**, using **Vite + TypeS
   - `Hud`: score/health/time/level/combo + mute state.
 - Use typed interfaces and explicit state enums.
 - Prefer deterministic helper utilities in `src/utils/` (`clamp`, RNG helpers, geometry helpers).
+- Write only in English
 
 ## Definition of Done
 - `npm run dev` launches playable game loop.
@@ -90,6 +91,7 @@ If something fails or a first attempt is wrong, append a new row immediately and
 
 | Date (YYYY-MM-DD) | Context | What failed | Root cause | Fix applied | Prevention rule added |
 |---|---|---|---|---|---|
+| 2026-02-05 | Project bootstrap (`npm install`) | Dependency installation failed (`ENOTFOUND`) | DNS/network access to `registry.npmjs.org` unavailable in current environment | Completed local scaffold files first; deferred dependency install until network is available | Before running `npm install`, verify npm registry reachability in the environment (`npm ping` or DNS check) |
 
 ### Logging Rules
 - Never rewrite old rows; only append.
