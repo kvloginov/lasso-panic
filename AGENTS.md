@@ -35,6 +35,32 @@ Build a fully playable single-screen game, **Lasso Panic**, using **Vite + TypeS
 - Must include start overlay, game-over overlay, restart, and HUD.
 - Save best score and best survival time in `localStorage`.
 
+## Game Overview (Detailed)
+- Player goal:
+  - Survive as long as possible while maintaining health and maximizing score.
+  - Efficiently lasso groups of same-type `active` items to sustain health.
+- Match resolution:
+  - Success case: selected `active` items contain exactly one `typeId`.
+    - Remove selected items from play.
+    - Increase score by selected count (plus optional combo-based effects from config).
+    - Heal health based on configured per-item and combo tuning.
+  - Error case: selected `active` items contain 2+ `typeId` values.
+    - Keep all selected items.
+    - Apply damage using configured base + wrong-item contribution.
+    - Trigger negative feedback (sound + visual error signal).
+  - Neutral case:
+    - Preview items are ignored by selection.
+    - Empty or too-short lasso should not produce score gain.
+- Difficulty progression:
+  - Spawn cadence accelerates over survival time (bounded by minimum interval).
+  - Number of unlocked item types increases over time.
+  - Optional scale shrink and soft-cap pressure increase selection precision demand.
+- Session lifecycle:
+  - `Start Overlay` -> `Running` -> `Game Over` -> `Restart`.
+  - `M` toggles mute state.
+  - `P` toggles pause state (if implemented/enabled).
+  - `R` restarts after game over.
+
 ## Required Project Structure
 - `src/main.ts`
 - `src/game/scenes/BootScene.ts`
@@ -49,6 +75,32 @@ Build a fully playable single-screen game, **Lasso Panic**, using **Vite + TypeS
 - `src/audio/sfx.ts`
 - `src/config.ts`
 - `src/utils/*`
+
+## Package / Module Map
+- `src/main.ts`
+  - Phaser bootstrap only (renderer, scale, scene wiring). Keep gameplay logic out of this file.
+- `src/config.ts`
+  - Single source of truth for balancing and tunables (health, spawn, damage/heal, progression, UX thresholds).
+- `src/assets/`
+  - `palettes.ts`: shared color palettes.
+  - `sprites.ts`: 8x8 sprite definitions for each `typeId` and optional animation frames.
+  - `generateTextures.ts`: runtime texture generation and texture key catalog creation.
+- `src/audio/`
+  - `sfx.ts`: runtime-generated WebAudio SFX, mute state, and event-based sound API.
+- `src/game/scenes/`
+  - `BootScene.ts`: bootstraps generated textures/audio services and transitions to gameplay scene.
+  - `GameScene.ts`: owns game state machine, loop updates, input orchestration, rule application, overlays, persistence hooks.
+- `src/game/entities/`
+  - `Item.ts`: per-item state and sprite lifecycle (`preview`/`active`, animation, activation, cleanup).
+- `src/game/systems/`
+  - `Spawner.ts`: spawn scheduling, preview->active transition, placement attempts, difficulty-aware spawn behavior.
+  - `LassoSelection.ts`: pointer tracking, polygon construction, hit testing, and selection result payload.
+- `src/ui/`
+  - `Hud.ts`: score/health/time/level/combo/mute display plus start/game-over/pause overlays.
+- `src/utils/`
+  - Deterministic helpers (`clamp`, RNG, geometry, storage helpers) used by game systems.
+- `README.md`
+  - Player-facing run instructions, controls, mechanics summary, and key config documentation.
 
 ## Architecture and Coding Standards
 - Keep tunables in `src/config.ts` (health, drain, heal, damage, spawn timing, type progression, scale, caps).

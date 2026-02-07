@@ -29,6 +29,10 @@ export interface GameTuning {
   readonly successFlashColor: number;
   readonly errorFlashColor: number;
   readonly scorePerItem: number;
+  readonly scoreBonusMinGroup: number;
+  readonly scoreBonusStep: number;
+  readonly maxCombo: number;
+  readonly comboDecayOnSingleSuccessRatio: number;
   readonly storageBestScoreKey: string;
   readonly storageBestTimeKey: string;
 }
@@ -64,6 +68,10 @@ export const CONFIG: GameTuning = {
   successFlashColor: 0x95d67f,
   errorFlashColor: 0xff667a,
   scorePerItem: 1,
+  scoreBonusMinGroup: 2,
+  scoreBonusStep: 1,
+  maxCombo: 20,
+  comboDecayOnSingleSuccessRatio: 0.2,
   storageBestScoreKey: 'lassoPanic.bestScore',
   storageBestTimeKey: 'lassoPanic.bestTimeSec'
 };

@@ -30,8 +30,10 @@ npm run preview
 - Lasso evaluates only `active` items.
 - Success rule: if selected active items are one `typeId` only:
   - selected items are removed
-  - score increases
+  - score increases by base per-item points plus a growing group bonus from `2+` items
   - health is restored
+  - combo increases only when a successful lasso contains `2+` items
+  - higher combo increases HP restore on successful merges
 - Error rule: if selected items contain mixed `typeId`:
   - items are kept
   - damage is applied
@@ -98,7 +100,9 @@ Difficulty increases while survival time grows:
 - `lassoPointSpacingPx`: minimum pointer movement to append lasso point
 - `lassoMinPoints`: minimum number of points for valid lasso
 - `lassoMinPathLengthPx`: minimum lasso path length
-- `scorePerItem`: score gain per collected item
+- `scorePerItem`: base score gain per collected item
+- `scoreBonusMinGroup`: minimum same-type group size that unlocks score bonus
+- `scoreBonusStep`: growth step for group score bonus
 
 ## Validation Notes
 

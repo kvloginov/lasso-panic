@@ -261,14 +261,32 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  private computeScoreGain(count: number): number {
+    const baseScore = count * CONFIG.scorePerItem;
+    const bonusEligible = Math.max(0, count - (CONFIG.scoreBonusMinGroup - 1));
+    const bonusScore = ((bonusEligible * (bonusEligible + 1)) / 2) * CONFIG.scoreBonusStep;
+    return baseScore + bonusScore;
+  }
+
+  private decayComboOnSingleSuccess(currentCombo: number): number {
+    if (currentCombo <= 0) {
+      return 0;
+    }
+
+    const loss = Math.max(1, Math.ceil(currentCombo * CONFIG.comboDecayOnSingleSuccessRatio));
+    return Math.max(0, currentCombo - loss);
+  }
+
   private handleSuccess(count: number, selected: readonly Item[]): void {
     const first = selected[0]?.sprite;
     const x = first ? first.x : CONFIG.gameWidth / 2;
     const y = first ? first.y : CONFIG.gameHeight / 2;
+    const scoreGain = this.computeScoreGain(count);
+    const buildsCombo = count > 1;
 
     this.spawner.removeItems(selected);
-    this.score += count * CONFIG.scorePerItem;
-    this.combo += 1;
+    this.score += scoreGain;
+    this.combo = buildsCombo ? Math.min(this.combo + 1, CONFIG.maxCombo) : this.decayComboOnSingleSuccess(this.combo);
 
     const heal = count * CONFIG.healPerItem + this.combo * CONFIG.comboHealBonusPerStep;
     this.health = clamp(this.health + heal, 0, CONFIG.healthStart);
@@ -276,7 +294,7 @@ export class GameScene extends Phaser.Scene {
     this.sfx.success(count, this.combo);
     this.flash(CONFIG.successFlashColor);
     this.emitSuccessSparkles(x, y);
-    this.showFeedback(`+${count}`, x, y, '#c5ffbd');
+    this.showFeedback(`+${scoreGain}`, x, y, '#c5ffbd');
   }
 
   private handleError(selectedCount: number, majorTypeCount: number): void {
