@@ -1,20 +1,19 @@
 # Lasso Panic
 
-Single-screen pixel-art arcade game built with Vite + TypeScript + Phaser 3.
+Single-screen pixel-art arcade survival game about fast pattern recognition and risky lasso decisions.
 
-All visual and audio assets are generated at runtime in code:
-- 8x8 item textures are generated into Phaser `TextureManager`
-- SFX are synthesized with WebAudio (`OscillatorNode` + envelopes)
-- No external PNG/WAV/MP3/font assets are used
+![Gameplay preview](docs/game-preview.webp)
 
-## Run
+## What the game is about
 
-```bash
-npm i
-npm run dev
-npm run build
-npm run preview
-```
+You survive by drawing a lasso around matching active items.
+
+- Your health is always draining.
+- Items appear as preview ghosts first, then become active.
+- Only active items count for a lasso result.
+- Lasso one item type only: gain score and heal.
+- Lasso mixed item types: take damage and keep all selected items.
+- Last as long as possible and beat your best score/time.
 
 ## Controls
 
@@ -23,88 +22,20 @@ npm run preview
 - `P`: pause/unpause
 - `R`: restart after game over
 
-## Core Mechanics
+## Run locally
 
-- Health starts at `100` and drains continuously over time.
-- Items spawn as `preview` ghosts first, then become `active`.
-- Lasso evaluates only `active` items.
-- Success rule: if selected active items are one `typeId` only:
-  - selected items are removed
-  - score increases by base per-item points plus a growing group bonus from `2+` items
-  - health is restored
-  - combo increases only when a successful lasso contains `2+` items
-  - higher combo increases HP restore on successful merges
-- Error rule: if selected items contain mixed `typeId`:
-  - items are kept
-  - damage is applied
-  - camera shake + error flash/SFX are triggered
-- Empty or too-short lasso: no score/health change (feedback only).
-- Game ends when health reaches `0`.
-- Best score and best survival time are saved in `localStorage`.
+```bash
+npm i
+npm run dev
+npm run build
+npm run preview
+```
 
-## Difficulty Ramp
+## About this project
 
-Difficulty increases while survival time grows:
-- Spawn interval decreases down to a minimum.
-- More item types unlock over time.
-- Item size slowly shrinks to a configured minimum.
-- A soft cap limits total simultaneous items.
+This game was generated with AI and is intentionally a vibe-code experiment.
+Most of the project was produced in two prompts.
 
-## Runtime Asset Generation
+## For developers
 
-- Palette: `src/assets/palettes.ts`
-- 8x8 sprite definitions: `src/assets/sprites.ts`
-- Texture generation: `src/assets/generateTextures.ts`
-- SFX synthesis: `src/audio/sfx.ts`
-
-## Project Structure
-
-- `src/main.ts`
-- `src/game/scenes/BootScene.ts`
-- `src/game/scenes/GameScene.ts`
-- `src/game/entities/Item.ts`
-- `src/game/systems/Spawner.ts`
-- `src/game/systems/LassoSelection.ts`
-- `src/ui/Hud.ts`
-- `src/assets/palettes.ts`
-- `src/assets/sprites.ts`
-- `src/assets/generateTextures.ts`
-- `src/audio/sfx.ts`
-- `src/config.ts`
-- `src/utils/*`
-
-## `config.ts` Parameters
-
-`src/config.ts` contains all gameplay tuning values.
-
-- `healthStart`: initial health points
-- `healthDrainPerSec`: passive health drain per second
-- `healPerItem`: heal amount for each collected item
-- `comboHealBonusPerStep`: extra heal bonus from combo progression
-- `damageBase`: fixed damage on mixed-type selection
-- `damagePerWrong`: extra damage per wrong item (`selected - majorTypeCount`)
-- `previewDurationSec`: preview state duration before activation
-- `spawnIntervalStartSec`: initial spawn period
-- `spawnIntervalMinSec`: minimum spawn period
-- `spawnAccelerationPerSec`: spawn interval reduction over time
-- `startTypes`: number of item types available at start
-- `maxTypes`: max unlocked item types
-- `typesIncreaseEverySec`: type unlock interval
-- `itemScaleStart`: initial render scale of 8x8 sprites
-- `itemScaleMin`: minimum render scale
-- `itemScaleShrinkPerSec`: scale reduction over time
-- `maxItemsSoftCap`: max amount of active+preview items
-- `spawnPaddingPx`: edge padding for spawn placement
-- `spawnPlacementAttempts`: random placement attempts before fallback
-- `spawnMinDistancePx`: minimum distance between spawned item centers
-- `lassoPointSpacingPx`: minimum pointer movement to append lasso point
-- `lassoMinPoints`: minimum number of points for valid lasso
-- `lassoMinPathLengthPx`: minimum lasso path length
-- `scorePerItem`: base score gain per collected item
-- `scoreBonusMinGroup`: minimum same-type group size that unlocks score bonus
-- `scoreBonusStep`: growth step for group score bonus
-
-## Validation Notes
-
-- Build validation is done with `npm run build`.
-- In restricted sandboxes where localhost sockets are blocked, `npm run dev` / `npm run preview` may fail with `listen EPERM` even when project code is correct.
+Technical and agent-facing implementation details live in `AGENTS.md`.
