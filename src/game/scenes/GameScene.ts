@@ -49,6 +49,8 @@ export class GameScene extends Phaser.Scene {
 
   private feedbackText!: Phaser.GameObjects.Text;
 
+  private autoPreviewMode = false;
+
   constructor() {
     super('GameScene');
   }
@@ -88,6 +90,7 @@ export class GameScene extends Phaser.Scene {
 
     this.hud = new Hud(this);
     this.hud.showStart();
+    this.autoPreviewMode = this.isPreviewModeEnabled();
 
     this.feedbackText = this.add
       .text(CONFIG.gameWidth / 2, CONFIG.gameHeight * 0.26, '', {
@@ -107,6 +110,11 @@ export class GameScene extends Phaser.Scene {
 
     this.registerInput();
     this.registerKeys();
+
+    if (this.autoPreviewMode) {
+      this.startRun();
+    }
+
     this.refreshHud();
   }
 
@@ -387,5 +395,13 @@ export class GameScene extends Phaser.Scene {
         ease: 'Sine.InOut'
       });
     }
+  }
+
+  private isPreviewModeEnabled(): boolean {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+
+    return new URLSearchParams(window.location.search).get('preview') === '1';
   }
 }

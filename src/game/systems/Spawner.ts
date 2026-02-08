@@ -72,7 +72,7 @@ export class Spawner {
 
     for (let i = this.items.length - 1; i >= 0; i -= 1) {
       if (removeSet.has(this.items[i].id)) {
-        this.items[i].destroy();
+        this.items[i].collect();
         this.items.splice(i, 1);
       }
     }

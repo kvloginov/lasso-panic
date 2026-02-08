@@ -17,6 +17,13 @@ export interface GameTuning {
   readonly itemScaleStart: number;
   readonly itemScaleMin: number;
   readonly itemScaleShrinkPerSec: number;
+  readonly itemPreviewScaleRatio: number;
+  readonly itemHoverAmplitudePx: number;
+  readonly itemHoverSpeedHz: number;
+  readonly itemActivePulseScale: number;
+  readonly itemActivationBurstScale: number;
+  readonly itemActivationBurstDurationSec: number;
+  readonly itemCollectDurationMs: number;
   readonly maxItemsSoftCap: number;
   readonly spawnPaddingPx: number;
   readonly spawnPlacementAttempts: number;
@@ -56,6 +63,13 @@ export const CONFIG: GameTuning = {
   itemScaleStart: 9,
   itemScaleMin: 6,
   itemScaleShrinkPerSec: 0.03,
+  itemPreviewScaleRatio: 0.9,
+  itemHoverAmplitudePx: 3.2,
+  itemHoverSpeedHz: 1.45,
+  itemActivePulseScale: 0.042,
+  itemActivationBurstScale: 0.16,
+  itemActivationBurstDurationSec: 0.16,
+  itemCollectDurationMs: 135,
   maxItemsSoftCap: 38,
   spawnPaddingPx: 52,
   spawnPlacementAttempts: 24,
